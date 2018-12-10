@@ -1,0 +1,56 @@
+<html>
+<head>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+</head>
+<style>
+	body {
+		text-align: center;
+	}
+
+	h1 {
+		padding: 3%;
+	}
+
+	form {
+		padding-right: 33%;
+		padding-left: 33%;
+		padding-bottom: 30px;
+	}
+
+	.error {
+		margin: auto;
+		margin-bottom: 10px;
+		width: 450px;
+	}
+	
+</style>
+<body>
+<h1>Register</h1>
+<form action="/registerAuth" method="POST">
+	<div class="form-group">
+		First name: <input type="text" class="form-control" name = "fname" required/>
+	</div>
+	<div class="form-group">
+		<label>Last name: </label>
+		<input type="text" class="form-control" name = "lname" required/>
+	</div>
+	<div class="form-group">
+		Email: <input type="text" class="form-control" name = "email" required/>
+	</div>
+	<div class="form-group">
+		Password: <input type="password" class="form-control" name = "password" required/>
+	</div>
+	<input type="submit" class="btn btn-primary" value = Register />
+	{% if error %}
+		<p class="error"><strong>Error:</strong> {{error}}</p>
+	{% endif %}
+</form>
+
+<a href="/">Go back</a>
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+</body>
+
+
+</html>

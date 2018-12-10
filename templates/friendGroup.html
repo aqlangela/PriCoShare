@@ -1,0 +1,187 @@
+
+<!DOCTYPE html>
+
+<style>
+.navbar-top{
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #333;
+    position: fixed;
+    top: 0;
+    left:0;
+    height:8%;
+    width: 100%;
+}
+
+.navbar-text-li{
+    float: left;
+    font-size:130%;
+    height:100%;
+    margin-top:0px;
+}
+
+.navbar-text-li a{
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    height:100%;
+    text-decoration: none;
+}
+
+.navbar-text-li a:hover:not(.navbar-text) {
+    background-color: #111;
+}
+
+.sidebar-left {
+    position:fixed;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    left:0px;
+    top:8%;
+    width: 15%;
+    background-color: #f1f1f1;
+    position: fixed;
+    height: 100%;
+    overflow: auto;
+}
+
+.sidebar-left li a {
+    margin-top:10px;
+    display: block;
+    color: #000;
+    padding: 8px 16px;
+    text-decoration: none;
+}
+
+li a:hover {
+    background-color: #555;
+    color: white;
+}
+
+</style>
+
+<style type="text/css">
+html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: scroll;
+}
+
+.input-box{
+    box-align:center;
+    margin-right:80%;
+}    
+
+</style>
+
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <title>home</title>
+</head>
+
+<body>
+    <ul class="navbar-top" id="navbar">
+    {% if email %}
+      <li class='navbar-text-li'><a class='navbar-text' href=''>Welcome {{email}}</a></li>
+      <li class='navbar-text-li'><a class='navbar-text' href='/logout'>Logout</a></li>
+     {% endif %}
+    </ul>
+    <ul class='sidebar-left' id='sidebar'>
+        <li id = 'home'>
+            <a href = '/home'>Home</a>
+        </li>
+        <li id = 'postContent'>
+            <a href = '/post'>Post</a>
+        </li>
+        <li id = 'tags'>
+            <a href = '/tags'>Tags</a>
+        </li>
+        <li id = 'friendGroup'>
+            <a href = '/friendgroup'>Friend group</a>
+        </li>
+        <li id = 'myEvents'>
+            <a href = '/myEvents'>My events</a>
+        </li>
+    </ul>
+
+
+    <div data-spy ="scroll" style="margin-top:5%;margin-left:15%;padding:1px 16px;height:1000px;">
+	   <h2>Friend Groups</h2>
+        {% if error %}
+            <p class="error"><strong>Error:</strong> {{error}}</p>
+        {% endif %}
+       <div>
+       {% for line in posts %}
+      	<div class="container"  id="group{{line.fg_name}}">
+            <div class="row">
+                <div class="col"><h2>{{line.fg_name}}</h2>
+                    <h6>Members:</h6>
+                </div>
+            </div>
+            <div class ="col">
+                {% for t in member %}
+                    {% if t.owner_email == line.owner_email and t.fg_name == line.fg_name %}
+                    <span> {{ t.email }} </span>
+                    <br>
+                    {% endif%}
+                {% endfor %}
+            </div> 
+            <br>
+            {% if line.owner_email==email %}
+            <h6>Input the names you want to add:</h6>
+                <div class="col">
+                    <div style="padding:1px 16px">
+                        <div class="row">
+                            <p style="padding-top:1%; height:20px">First_Name</p>
+                            <input id="fn{{line.fg_name}}" type="text" name="First_Name" class="input-box" required/></br>
+                        </div>
+                        <div class="row">
+                            <p style="padding-top:1%; height:20px">Last_Name</p>
+                            <input id="ln{{line.fg_name}}" type="text" name="Last_Name" class="input-box" required/></br>
+                        </div>
+                        <div class="row">
+                            <p style="padding-top:1%; height:20px">Please specify email</p>
+                            <input id="se{{line.fg_name}}" type="text" name="Specified_email" placeholder="optional unless required" class="input-box"/></br>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <button style="border-radius:10%" onclick="addFriend2('{{line.fg_name}}')">Add</button>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        <br>
+       {% endfor %}
+   	   </div>
+    </div>
+
+<script  type="text/javascript">
+function addFriend2(fg_name) {
+    console.log('success')
+    const fn = document.querySelector('#fn'+fg_name).value;
+    const ln = document.querySelector('#ln'+fg_name).value;
+    const se = document.querySelector('#se'+fg_name).value;
+
+    $.ajax({
+        type: 'POST',
+        url: '/friendGroup',
+        data: JSON.stringify({ 'fg_name': fg_name, First_Name: fn, Last_Name: ln, Specified_email: se }),
+        contentType: 'application/json',
+        success: function(json) {
+            if (!json.error) {window.location.reload(true);}
+        }
+    });
+}
+
+</script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+</body>
+</html>

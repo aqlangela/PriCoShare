@@ -1,0 +1,168 @@
+
+<!DOCTYPE html>
+
+<style>
+.navbar-top{
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #333;
+    opacity:1;
+    position: fixed;
+    top: 0;
+    left:0;
+    height:8%;
+    width: 100%;
+}
+
+.navbar-text-li{
+    float: left;
+    font-size:130%;
+    height:100%;
+    margin-top:0px;
+}
+
+.navbar-text-li a{
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    height:100%;
+    text-decoration: none;
+}
+
+.navbar-text-li a:hover:not(.navbar-text) {
+    background-color: #111;
+}
+
+.sidebar-left {
+    position:fixed;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    left:0px;
+    top:8%;
+    width: 15%;
+    background-color: #f1f1f1;
+    position: fixed;
+    height: 100%;
+    overflow: auto;
+}
+
+.sidebar-left li a {
+    margin-top:10px;
+    display: block;
+    color: #000;
+    padding: 8px 16px;
+    text-decoration: none;
+}
+
+li a:hover {
+    background-color: #555;
+    color: white;
+}
+
+</style>
+<style type="text/css">
+    body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: scroll;
+    }
+
+    .container {
+        background-color: #f1f1f1;
+        margin: 15px;
+    }
+</style>
+
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <title>PriCoShare</title>
+</head>
+
+<body>
+    <ul class="navbar-top" id="navbar">
+        {% if email %}
+        <li class='navbar-text-li'><a class='navbar-text' href=''>Welcome {{email}}</a></li>
+        <li class='navbar-text-li'><a class='navbar-text' href='/logout'>Logout</a></li>
+        {% else %}
+        <li class='navbar-text-li'><a class='navbar-text' href='/login'>Login</a></li>
+        <li class='navbar-text-li'><a class='navbar-text' href='/register'>Register</a></li>
+        {% endif %}
+    </ul>
+    <ul class='sidebar-left' id='sidebar'>
+        <li id = 'home'>
+            <a href = '/home'>Home</a>
+        </li>
+
+          <li id = 'postContent'>
+              <a href = '/post'>Post</a>
+          </li>
+          <li id = 'tags'>
+              <a href = '/tags'>Tags</a>
+          </li>
+          <li id = 'friendGroup'>
+              <a href = '/friendgroup'>Friend group</a>
+          </li>
+          <li id = 'myEvents'>
+              <a href = '/myEvents'>My events</a>
+          </li>
+
+    </ul>
+    <div data-spy ="scroll" style="margin-top:5%;margin-left:15%;padding:1px 16px;height:1000px;">
+      <h2>My events</h2>
+      <div>
+      {% for line in myEvents %}
+      	<div class="container" id="event{{line.item_id}}">
+            <div class="row">
+                <a style="margin-left:1.5%">item #</a><a name ="item_id" >{{line.item_id}}</a>
+                <div class="col">{{line.email_post}} posted posted at {{line.post_time}}</div>
+                {% if line.email_post==email %}
+                <button class="col" onclick="cancel({{line.item_id}})">Don't want to join any more</button>
+                {% endif%}
+            </div>
+            <div class="row">
+                <div class="col"><h2>{{line.event_name}}</h2></div>
+            </div>
+            <div class="row">
+                <div class="col">{{line.event_description}}</div>
+            </div>
+            <div class="row">
+                <div class="col">Date: {{line.event_date}}</div>
+                <div class="col">Location: {{line.event_location}}</div>
+                <div class="col"> </div>
+            </div>
+
+            <!-- ########################################################### -->
+            <!-- <form action="" method="POST"> -->
+            </form>
+          </div>
+
+        {% endfor %}
+       </div>
+      </div>
+<script type="text/javascript">
+
+function cancel(item_id){
+  child = document.getElementById("event"+item_id);
+  child.parentNode.removeChild(child);
+  $.ajax({
+    type: 'POST',
+    url: '/cancelEvents',
+    data: JSON.stringify({'item_id':item_id}),
+    contentType: 'application/json'
+  });
+
+}
+
+
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+</body>
+</html>

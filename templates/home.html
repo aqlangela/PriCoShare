@@ -1,0 +1,257 @@
+
+<!DOCTYPE html>
+
+<style>
+.navbar-top{
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #333;
+    opacity:1;
+    position: fixed;
+    top: 0;
+    left:0;
+    height:8%;
+    width: 100%;
+}
+
+.navbar-text-li{
+    float: left;
+    font-size:130%;
+    height:100%;
+    margin-top:0px;
+}
+
+.navbar-text-li a{
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    height:100%;
+    text-decoration: none;
+}
+
+.navbar-text-li a:hover:not(.navbar-text) {
+    background-color: #111;
+}
+
+.sidebar-left {
+    position:fixed;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    left:0px;
+    top:8%;
+    width: 15%;
+    background-color: #f1f1f1;
+    position: fixed;
+    height: 100%;
+    overflow: auto;
+}
+
+.sidebar-left li a {
+    margin-top:10px;
+    display: block;
+    color: #000;
+    padding: 8px 16px;
+    text-decoration: none;
+}
+
+
+li a:hover {
+    background-color: #555;
+    color: white;
+}
+
+</style>
+<style type="text/css">
+    body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: scroll;
+    }
+
+    .container {
+        background-color: #f1f1f1;
+        margin: 15px;
+        padding: 15px;
+
+    }
+
+    .error {
+    margin: auto;
+    margin-bottom: 10px;
+    width: 450px;
+    }
+</style>
+
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <title>PriCoShare</title>
+</head>
+
+<body>
+    <ul class="navbar-top" id="navbar">
+        {% if email %}
+        <li class='navbar-text-li'><a class='navbar-text' href=''>Welcome {{email}}</a></li>
+        <li class='navbar-text-li'><a class='navbar-text' href='/logout'>Logout</a></li>
+        {% else %}
+        <li class='navbar-text-li'><a class='navbar-text' href='/login'>Login</a></li>
+        <li class='navbar-text-li'><a class='navbar-text' href='/register'>Register</a></li>
+        {% endif %}
+    </ul>
+    <ul class='sidebar-left' id='sidebar'>
+        <li id = 'home'>
+            <a href = '/home'>Home</a>
+        </li>
+        {% if email %}
+            <li id = 'postContent'>
+                <a href = '/post'>Post</a>
+            </li>
+            <li id = 'tags'>
+                <a href = '/tags'>Tags</a>
+            </li>
+            <li id = 'friendGroup'>
+                <a href = '/friendgroup'>Friend group</a>
+            </li>
+            <li id = 'myEvents'>
+                <a href = '/myEvents'>My events</a>
+            </li>
+        {% endif %}
+    </ul>
+    <div data-spy ="scroll" style="margin-top:5%;margin-left:15%;padding:1px 16px;height:1000px;">
+    <h2>Events</h2>
+    {% if comment_error %}
+        <p class="error"><strong>Error:</strong> {{comment_error}}</p>
+    {% endif %}
+    <div>
+    {% for line in posts %}
+      	<div class="container" id="event{{line.item_id}}">
+            <div class="row">
+                <span style="margin-left:1.5%">item #</span><span name ="item_id" >{{line.item_id}}</span>
+                <div class="col">{{line.email_post}} posted at {{line.post_time}}</div>
+                {% if line.email_post==email %}
+                <button class="col" style="border-radius:10%" onclick="deleteEvent({{line.item_id}})">Delete</button>
+                {% endif %}
+            </div>
+            <div class="row">
+                <div class="col"><h2>{{line.event_name}}</h2></div>
+            </div>
+            <div class="row">
+                <div class="col">{{line.event_description}}</div>
+            </div>
+            <div class="row">
+                <div class="col"><h6>Date: {{line.event_date}}</h6></div>
+                <div class="col"><h6>Location: {{line.event_location}}</h6></div>
+            </div>
+            <div class="row">
+                <div class="col"><h5>Sign Up This event？</h5>
+                    <select id = "selection{{line.item_id}}" >
+            				  <option>Yes</option>
+                      <option selected>No</option>
+            				</select>
+                  <button style="border-radius:10%" onclick="signup({{line.item_id}})">Submit</button>
+                  <span id="txtHint{{line.item_id}}"></span>
+                </div>
+            </div>
+
+            <div class ="row">
+                <div class="col"><h5>Tags: </h5>
+                {% for t in tags %}
+                    {% if t.item_id == line.item_id %}
+                    <span> {{ t.fname }} {{ t.lname}}. </span>
+                    {% endif%}
+                {% endfor %}
+                </div>
+            </div>
+            <div class ="row">
+                <div class="col"><h5>Comments/Ratings:</h5>  
+                {% for r in ratings %}
+                    {% if r.item_id == line.item_id %}
+                    <span>{{r.email}}: {{r.emoji}} </span>
+                    <br>
+                    {% endif%}
+                {% endfor %}
+                </div>
+            </div>
+
+            <div class ="row">
+                <div class="col"><h5>Add new tag:</h5>
+                <input type ="text" name="tag" id="tag{{line.item_id}}" required/>
+                <button style="border-radius:10%" onclick="eventHandler({{line.item_id}})">Submit</button>
+                </div>
+            </div>
+
+
+            <div class ="row">
+                <div class="col"><h5>Add new comment:</h5>
+                <input type ="text" name="comment" id="comment{{line.item_id}}" required/>
+                <button style="border-radius:10%" onclick="addComment({{line.item_id}})">Submit</button>
+                </div>
+            </div>
+
+      	</div>
+
+      {% endfor %}
+     </div>
+
+<script  type="text/javascript">
+function signup(item_id) {
+    Choice = document.getElementById("selection"+item_id).value;
+    if (Choice=="Yes"){
+        document.getElementById("txtHint"+item_id).innerHTML="You signed up for it!";
+        $.ajax({
+        type: 'POST',
+        url: '/Signup',
+        data: JSON.stringify({'item_id':item_id}),
+        contentType: 'application/json'
+        });
+    }
+}
+
+function deleteEvent(item_id){
+    child = document.getElementById("event"+item_id);
+    child.parentNode.removeChild(child);
+    $.ajax({
+        type: 'POST',
+        url: '/DeleteEvent',
+        data: JSON.stringify({'item_id':item_id}),
+        contentType: 'application/json'
+    });
+}
+     
+function eventHandler(id) {
+    const tag = document.querySelector("#tag"+id).value;
+    $.ajax({
+        type: 'POST',
+        url: '/add_tag',
+        data: JSON.stringify({ id: id, tag: tag }),
+        contentType: 'application/json',
+        success: function(json) {
+            if (!json.error) {window.location.reload(true);}
+        }
+    });
+}
+
+function addComment(id){
+    const comment = document.querySelector("#comment"+id).value;
+    $.ajax({
+        type: 'POST',
+        url: '/add_comment',
+        data: JSON.stringify({ id: id, comment: comment }),
+        contentType: 'application/json',
+        success: function(json) {
+            if (!json.error) {window.location.reload(true);}
+        }
+    });
+}
+
+
+</script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+</body>
+</html>
